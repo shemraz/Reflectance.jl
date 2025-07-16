@@ -3,7 +3,11 @@ uuid = "ce658124-c64e-440a-9f45-0760740a6285"
 authors = ["shemraz <shem.raz@outlook.com> and contributors"]
 version = "1.0.0-DEV"
 
+[deps]
+Chain = "8be319e6-bccf-4806-a6f7-6fae938471bc"
+
 [compat]
+Chain = "0.6.0"
 julia = "1.6.7"
 
 [extras]

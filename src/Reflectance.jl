@@ -14,10 +14,11 @@ end
 
 struct PTM
     header::Meta
-    texels::AbstractArray
+    luma::Array{Int32, 3}
+    chroma::Array{Int32, 3}
 end
 
-function header(io::IO) ::Vector{Any}
+function get_header!(io::IO)::Vector{Any}
     @> eachline(io) begin
         first(_, 6)
         vcat(
@@ -32,22 +33,30 @@ function header(io::IO) ::Vector{Any}
     end
 end
 
-# TODO: Fix shape of returned array
-function texels(io::IO)
-    arr = zeros(UInt8, 3361*2970*9)
+function get_texels!(io::IO, dims::Vector{Int}) ::AbstractArray
+    arr = zeros(UInt8, dims...)
     readbytes!(io, arr)
-    return arr
+    return [arr[:, :, 1:6], arr[:, :, 7:9]]
 end
 
-function readptm(
-    filename::AbstractString
-)
+function ptm(filename::AbstractString) ::PTM
     open(filename, "r") do io
-        PTM(
-            Meta(header(io)...),
-            collect(texels(io))
-        )
+        let spec = Meta(get_header!(io)...)
+            PTM(
+                spec,
+                get_texels!(
+                    io,
+                    [
+                        spec.height,
+                        spec.width,
+                        length(spec.scale)+3,
+                    ]
+                )...
+            )
+        end
     end
 end
+
+export PTM, Meta
 
 end

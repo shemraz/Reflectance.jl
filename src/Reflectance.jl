@@ -14,7 +14,7 @@ end
 
 struct PTM
     header::Meta
-    luma::Array{UInt8,3}
+    luma::Array{Float64,3}
     chroma::Array{UInt8,3}
 end
 
@@ -34,21 +34,22 @@ function header!(io::IO)::Vector{Any}
 end
 
 function pixels!(io::IO, width::Int, height::Int, planes::Int)::AbstractArray
-    chroma = zeros(UInt8, planes, width, height)
+    n = *(width, height, planes)
+    raw = Vector{UInt8}(undef, n)
+    readbytes!(io, raw)
 
-    for y in 1:height
-        row = Vector{UInt8}(undef, width * planes)
-        readbytes!(io, row)
-        index = 1
-
-        for x in 1:width
-            for p in 1:planes
-                chroma[p, x, y] = row[index]
-                index += 1
-            end
-        end
+    @> raw begin
+        reshape(planes, width, height)
+        permutedims((1, 2, 3))
     end
-    return chroma
+end
+
+function computecf(texels::Array{UInt8,3}, scale::Vector{Float64}, bias::Vector{Int64})::Array{Float64,3}
+    bias_norm = bias ./ 255.0
+    coeff(c, σ, β) = (c - β) * σ
+    scale3 = reshape(scale, (:, 1, 1))
+    bias3 = reshape(bias_norm, (:, 1, 1))
+    coeff.(texels, scale3, bias3)
 end
 
 function ptm(filename::AbstractString)::PTM
@@ -61,7 +62,7 @@ function ptm(filename::AbstractString)::PTM
                     spec.width,
                     spec.height,
                     length(spec.scale)
-                ),
+                ) |> texels -> computecf(texels, spec.scale, spec.bias),
                 pixels!(
                     io,
                     spec.width,
@@ -75,6 +76,6 @@ end
 
 include("transform.jl")
 
-export PTM, Meta, luminance
+export PTM, Meta, ptm, simulate
 
 end

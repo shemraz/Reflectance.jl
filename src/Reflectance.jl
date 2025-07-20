@@ -6,24 +6,24 @@ using Base.Iterators
 struct Meta
     version::String
     format::String
-    width::Int32
-    height::Int32
+    width::Int
+    height::Int
     scale::Vector{Float64}
-    bias::Vector{Int32}
+    bias::Vector{Int}
 end
 
 struct PTM
     header::Meta
-    luma::Array{Int32, 3}
-    chroma::Array{Int32, 3}
+    luma::Array{UInt8,3}
+    chroma::Array{UInt8,3}
 end
 
-function get_header!(io::IO)::Vector{Any}
+function header!(io::IO)::Vector{Any}
     @> eachline(io) begin
         first(_, 6)
         vcat(
             first(_, 2),
-            parse.(Int32, _[3:4]),
+            parse.(Int, _[3:4]),
             map(_[5:end]) do x
                 parse.(Float64,
                     filter(!=(""), split(x, " "))
@@ -33,30 +33,48 @@ function get_header!(io::IO)::Vector{Any}
     end
 end
 
-function get_texels!(io::IO, dims::Vector{Int}) ::AbstractArray
-    arr = zeros(UInt8, dims...)
-    readbytes!(io, arr)
-    return [arr[:, :, 1:6], arr[:, :, 7:9]]
+function pixels!(io::IO, width::Int, height::Int, planes::Int)::AbstractArray
+    chroma = zeros(UInt8, planes, width, height)
+
+    for y in 1:height
+        row = Vector{UInt8}(undef, width * planes)
+        readbytes!(io, row)
+        index = 1
+
+        for x in 1:width
+            for p in 1:planes
+                chroma[p, x, y] = row[index]
+                index += 1
+            end
+        end
+    end
+    return chroma
 end
 
-function ptm(filename::AbstractString) ::PTM
+function ptm(filename::AbstractString)::PTM
     open(filename, "r") do io
-        let spec = Meta(get_header!(io)...)
+        let spec = Meta(header!(io)...)
             PTM(
                 spec,
-                get_texels!(
+                pixels!(
                     io,
-                    [
-                        spec.height,
-                        spec.width,
-                        length(spec.scale)+3,
-                    ]
-                )...
+                    spec.width,
+                    spec.height,
+                    length(spec.scale)
+                ),
+                pixels!(
+                    io,
+                    spec.width,
+                    spec.height,
+                    3
+                )
             )
         end
     end
 end
 
-export PTM, Meta
+include("transform.jl")
+
+export PTM, Meta, luminance
 
 end

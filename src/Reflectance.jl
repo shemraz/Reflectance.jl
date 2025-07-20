@@ -44,6 +44,11 @@ function pixels!(io::IO, width::Int, height::Int, planes::Int)::AbstractArray
     end
 end
 
+"""
+    computecf(texels::Array{UInt8,3}, scale::Vector{Float64}, bias::Vector{Int64})::Array{Float64,3}
+
+Re-scale and bias an array of coefficients.
+"""
 function computecf(texels::Array{UInt8,3}, scale::Vector{Float64}, bias::Vector{Int64})::Array{Float64,3}
     bias_norm = bias ./ 255.0
     coeff(c, σ, β) = (c - β) * σ
@@ -52,6 +57,11 @@ function computecf(texels::Array{UInt8,3}, scale::Vector{Float64}, bias::Vector{
     coeff.(texels, scale3, bias3)
 end
 
+"""
+    ptm(filename::AbstractString)::PTM
+
+Load a `.ptm` file from the given path.
+"""
 function ptm(filename::AbstractString)::PTM
     open(filename, "r") do io
         let spec = Meta(header!(io)...)
@@ -76,6 +86,6 @@ end
 
 include("transform.jl")
 
-export PTM, Meta, ptm, simulate
+export ptm, simulate
 
 end

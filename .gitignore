@@ -1,3 +1,4 @@
 /Manifest.toml
 *.ptm
 *.png
+justfile

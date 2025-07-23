@@ -1,6 +1,6 @@
 name = "Reflectance"
 uuid = "ce658124-c64e-440a-9f45-0760740a6285"
-authors = ["shemraz <shem.raz@outlook.com> and contributors"]
+authors = ["Shem-Rāz Kaenan Idrees <shem.idrees@bnc.ox.ac.uk> and contributors"]
 version = "1.0.0-DEV"
 
 [deps]

@@ -5,9 +5,11 @@ version = "1.0.0-DEV"
 
 [deps]
 Chain = "8be319e6-bccf-4806-a6f7-6fae938471bc"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 
 [compat]
 Chain = "0.6.0"
+Revise = "3.8.0"
 julia = "1.6.7"
 
 [extras]

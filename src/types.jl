@@ -1,0 +1,36 @@
+# Common fields across all bases
+macro fields()
+    quote
+        width::Int32
+        height::Int32
+        format::String
+        type::String
+        colorspace::String
+        nplanes::Int8
+        materials::Dict{Symbol, Vector{Float64}}
+    end
+end
+
+# Bases
+abstract type Basis end
+
+struct PTM <: Basis @fields end
+struct HSH <: Basis @fields end
+struct RBF <: Basis
+    @fields
+    sigma::Float64
+    lights::Vector{Float64}
+    basis::Vector{Int8}
+end
+struct BLN <: Basis
+    @fields
+    resolution::Int8
+    basis::Int8
+end
+struct YCC{B<:Basis} <: Basis end
+
+# Core type
+struct Relightable{B<:Basis}
+spec::B
+planes::Array{Float64, 3}
+end

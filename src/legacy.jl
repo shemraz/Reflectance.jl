@@ -1,6 +1,8 @@
 using Chain: @chain as @>
 using Base.Iterators
 
+# TODO: Refactor legacy methods
+
 struct Meta
     version::String
     format::String
@@ -42,44 +44,30 @@ function pixels!(io::IO, width::Int, height::Int, planes::Int)::AbstractArray
     end
 end
 
-"""
-    renormalise(texels::Array{UInt8,3}, scale::Vector{Float64}, bias::Vector{Int64})::Array{Float64,3}
-
-Re-scale and bias an array of coefficients.
-"""
-function renormalise(texels::Array{UInt8,3}, scale::Vector{Float64}, bias::Vector{Int64})::Array{Float64,3}
-    bias_norm = bias ./ 255.0
-    coeff(c, σ, β) = (c - β) * σ
-    scale3 = reshape(scale, (:, 1, 1))
-    bias3 = reshape(bias_norm, (:, 1, 1))
-    coeff.(texels, scale3, bias3)
-end
 
 """
     ptm(filename::AbstractString)::PTM
 
-Load a `.ptm` file from the given path.
-"""
-function ptm(filename::AbstractString)::PTM
-    open(filename, "r") do io
-        let spec = Meta(header!(io)...)
-            PTM(
-                spec,
-                pixels!(
-                    io,
-                    spec.width,
-                    spec.height,
-                    length(spec.scale)
-                ) |> texels -> renormalise(texels, spec.scale, spec.bias),
-                pixels!(
-                    io,
-                    spec.width,
-                    spec.height,
-                    3
-                )
-            )
-        end
-    end
-end
-
-export ptm
+# Load a `.ptm` file from the given path.
+# """
+# function ptm(filename::AbstractString)::PTM
+#     open(filename, "r") do io
+#         let spec = Meta(header!(io)...)
+#             PTM(
+#                 spec,
+#                 pixels!(
+#                     io,
+#                     spec.width,
+#                     spec.height,
+#                     length(spec.scale)
+#                 ) |> texels -> renormalise(texels, spec.scale, spec.bias),
+#                 pixels!(
+#                     io,
+#                     spec.width,
+#                     spec.height,
+#                     3
+#                 )
+#             )
+#         end
+#     end
+# end

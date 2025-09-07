@@ -1,21 +1,28 @@
 # Common fields across all bases
 macro fields()
-    quote
-        width::Int32
-        height::Int32
-        format::String
-        type::String
-        colorspace::String
-        nplanes::Int8
-        materials::Dict{Symbol, Vector{Float64}}
-    end
+    esc(
+        quote
+            width::Int32
+            height::Int32
+            format::String
+            type::String
+            colorspace::String
+            nplanes::Int8
+            materials::Vector{Dict}
+        end
+    )
 end
 
 # Bases
 abstract type Basis end
 
-struct PTM <: Basis @fields end
-struct HSH <: Basis @fields end
+struct PTM <: Basis
+    @fields
+    quality::Int8
+end
+struct HSH <: Basis
+    @fields
+end
 struct RBF <: Basis
     @fields
     sigma::Float64
@@ -31,6 +38,7 @@ struct YCC{B<:Basis} <: Basis end
 
 # Core type
 struct Relightable{B<:Basis}
-spec::B
-planes::Array{Float64, 3}
+    base::Array{Float64,3}
+    planes::Array{Float64,3}
+    spec::B
 end

@@ -1,8 +1,8 @@
 module Reflectance
 
-include("legacy.jl")
+include("io.jl")
 include("transform.jl")
 
-export ptm, simulate
+export loaddir, simulate
 
 end

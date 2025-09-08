@@ -38,11 +38,13 @@ function loaddir(dir::String)
         JSON.parsefile(; dicttype=Dict{Symbol,Any})
         match_basis
     end
-    planes = @> filter(it -> endswith(it, ".jpg"), contents) begin
+    rgb, planes = @> filter(it -> endswith(it, ".jpg"), contents) begin
         @. parse_plane
         cat(_...; dims=1)
         dequant(spec.materials[1])
+        let dims = _
+            (dims[1:3, :, :], dims[4:end, :, :])
+        end
     end
-    base = planes[1:3, :, :]
-    return Relightable(base, planes[4:end, :, :], spec)
+    return Relightable(rgb, planes, spec)
 end

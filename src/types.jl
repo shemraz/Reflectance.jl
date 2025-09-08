@@ -1,4 +1,6 @@
 # Common fields across all bases
+const Material = Dict{Symbol, Vector{Float64}}
+
 macro fields()
     esc(
         quote
@@ -8,7 +10,7 @@ macro fields()
             type::String
             colorspace::String
             nplanes::Int8
-            materials::Vector{Dict{Symbol, Vector{Float64}}}
+            materials::Vector{Material}
         end
     )
 end

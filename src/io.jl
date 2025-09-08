@@ -6,7 +6,7 @@ import JSON
 include("types.jl")
 include("utils.jl")
 
-function parse_plane(path)::Array{Float64,3}
+function parse_plane(path::String)::Array{Float64,3}
     @> path begin
         FileIO.load
         ImageCore.channelview
@@ -27,24 +27,32 @@ function match_basis(info::Dict{Symbol,Any})::Basis
             info[:quality]
         )
     end
+    throw(ArgumentError("Unsupported basis type: $(info[:type])"))
 end
 
 function loaddir(dir::String)
     # TODO: Test case, assert length of 1D == nplanes
     contents = readdir(dir; join=true)
+    plane_files = filter(it -> endswith(it, ".jpg"), contents)
+   info_file = filter(it -> contains(it, "info.json"), contents)
 
-    spec = @> filter(it -> contains(it, "info.json"), contents) begin
+    spec = @> info_file begin
         first
         JSON.parsefile(; dicttype=Dict{Symbol,Any})
         match_basis
     end
-    rgb, planes = @> filter(it -> endswith(it, ".jpg"), contents) begin
-        @. parse_plane
+
+    dequantised = @> plane_files begin
+        map(parse_plane, _)
         cat(_...; dims=1)
         dequant(spec.materials[1])
-        let dims = _
-            (dims[1:3, :, :], dims[4:end, :, :])
-        end
     end
+
+    n_planes = spec.nplanes
+    n_rgb = 3
+
+    rgb = dequantised[1:n_rgb, :, :]
+    planes = dequantised[n_rgb+1:n_planes, :, :]
+
     return Relightable(rgb, planes, spec)
 end

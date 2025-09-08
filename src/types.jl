@@ -8,7 +8,7 @@ macro fields()
             type::String
             colorspace::String
             nplanes::Int8
-            materials::Vector{Dict}
+            materials::Vector{Dict{Symbol, Vector{Float64}}}
         end
     )
 end

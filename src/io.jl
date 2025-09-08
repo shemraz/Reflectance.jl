@@ -23,7 +23,7 @@ function match_basis(info::Dict{Symbol,Any})::Basis
             info[:type],
             info[:colorspace],
             info[:nplanes],
-            info[:materials],
+            convert(Vector{Dict{Symbol, Vector{Float64}}}, info[:materials]),
             info[:quality]
         )
     end
@@ -34,7 +34,7 @@ function loaddir(dir::String)
     # TODO: Test case, assert length of 1D == nplanes
     contents = readdir(dir; join=true)
     plane_files = filter(it -> endswith(it, ".jpg"), contents)
-   info_file = filter(it -> contains(it, "info.json"), contents)
+    info_file = filter(it -> contains(it, "info.json"), contents)
 
     spec = @> info_file begin
         first

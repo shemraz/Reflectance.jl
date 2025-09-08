@@ -38,7 +38,7 @@ struct YCC{B<:Basis} <: Basis end
 
 # Core type
 struct Relightable{B<:Basis}
-    base::Array{Float64,3}
+    rgb::Array{Float64,3}
     planes::Array{Float64,3}
     spec::B
 end

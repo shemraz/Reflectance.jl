@@ -2,7 +2,7 @@ using Reflectance
 using Test
 
 @testset "Reflectance.jl" begin
-    rl = loaddir("relight-ptm/")    
+    rl = loaddir("relight-ptm/", PTM)    
     v = (0.0, 1.0)
     res = light(rl, v)
     # Dimensions are (p, h, w)

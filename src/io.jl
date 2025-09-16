@@ -1,7 +1,7 @@
 import FileIO
 import ImageCore
 using Chain: @chain as @>
-import JSON
+import JSON3
 
 include("types.jl")
 include("utils.jl")
@@ -14,32 +14,15 @@ function parse_plane(path::String)::Array{Float64,3}
     end
 end
 
-function match_basis(info::Dict{Symbol,Any})::Basis
-    if info[:type] == "ptm"
-        return PTM(
-            info[:width],
-            info[:height],
-            info[:format],
-            info[:type],
-            info[:colorspace],
-            info[:nplanes],
-            convert(Vector{Dict{Symbol, Vector{Float64}}}, info[:materials]),
-            info[:quality]
-        )
-    end
-    throw(ArgumentError("Unsupported basis type: $(info[:type])"))
-end
 
-function loaddir(dir::String)
-    # TODO: Test case, assert length of 1D == nplanes
+function loaddir(dir::String, B::Type{T}) where T <: Basis
     contents = readdir(dir; join=true)
     plane_files = filter(it -> endswith(it, ".jpg"), contents)
-    info_file = filter(it -> contains(it, "info.json"), contents)
+    info_file = @> filter(it -> contains(it, "info.json"), contents) first
 
     spec = @> info_file begin
-        first
-        JSON.parsefile(; dicttype=Dict{Symbol,Any})
-        match_basis
+        read(String)
+        JSON3.read(B)
     end
 
     dequantised = @> plane_files begin

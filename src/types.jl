@@ -1,6 +1,7 @@
-# Common fields across all bases
-const Material = Dict{Symbol, Vector{Float64}}
+using StructTypes
+import InteractiveUtils: subtypes
 
+# Common fields across all bases
 macro fields()
     esc(
         quote
@@ -10,7 +11,7 @@ macro fields()
             type::String
             colorspace::String
             nplanes::Int8
-            materials::Vector{Material}
+            materials::Vector{Dict{Symbol, Vector{Float64}}}
         end
     )
 end
@@ -43,4 +44,9 @@ struct Relightable{B<:Basis}
     rgb::Array{Float64,3}
     planes::Array{Float64,3}
     spec::B
+end
+
+# JSON3 StructTypes
+for B in subtypes(Basis)
+    StructTypes.StructType(::Type{B}) = StructTypes.Struct()
 end

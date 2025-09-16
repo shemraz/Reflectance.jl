@@ -9,8 +9,11 @@ FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 ImageCore = "a09fc81d-aa75-5fe9-8630-4744c3626534"
 ImageIO = "82e4d734-157c-48bb-816b-45c225c6df19"
 ImageInTerminal = "d8c32880-2388-543b-8c61-d9f865259254"
+InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+StructTypes = "856f2bd8-1eba-4b0a-8007-ebc267875bd4"
 
 [compat]
 Chain = "0.6.0"
@@ -18,8 +21,11 @@ FileIO = "1.17.0"
 ImageCore = "0.10.5"
 ImageIO = "0.6.9"
 ImageInTerminal = "0.5.4"
+InteractiveUtils = "1.11.0"
 JSON = "0.21.4"
+JSON3 = "1.14.3"
 Revise = "3.8.0"
+StructTypes = "1.11.0"
 julia = "1.6.7"
 
 [extras]

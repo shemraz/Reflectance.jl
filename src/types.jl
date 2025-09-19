@@ -1,5 +1,4 @@
 using StructTypes
-import InteractiveUtils: subtypes
 
 # Common fields across all bases
 macro fields()
@@ -47,6 +46,6 @@ struct Relightable{B<:Basis}
 end
 
 # JSON3 StructTypes
-for B in subtypes(Basis)
+for B in [PTM, HSH, RBF, BLN, YCC]
     StructTypes.StructType(::Type{B}) = StructTypes.Struct()
 end

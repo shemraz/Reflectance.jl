@@ -1,7 +1,7 @@
 name = "Reflectance"
 uuid = "ce658124-c64e-440a-9f45-0760740a6285"
-authors = ["Shem-Rāz Kaenan Idrees <shem.idrees@bnc.ox.ac.uk> and contributors"]
 version = "1.0.0-DEV"
+authors = ["Shem-Rāz Kaenan Idrees <shem.idrees@bnc.ox.ac.uk> and contributors"]
 
 [deps]
 Chain = "8be319e6-bccf-4806-a6f7-6fae938471bc"
@@ -16,7 +16,6 @@ Chain = "0.6.0"
 FileIO = "1.17.0"
 ImageCore = "0.10.5"
 JSON3 = "1.14.3"
-Revise = "3.8.0"
 StructTypes = "1.11.0"
 julia = "1.6.7"
 

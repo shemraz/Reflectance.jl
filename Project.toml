@@ -8,7 +8,6 @@ Chain = "8be319e6-bccf-4806-a6f7-6fae938471bc"
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 ImageCore = "a09fc81d-aa75-5fe9-8630-4744c3626534"
 JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
-Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 StructTypes = "856f2bd8-1eba-4b0a-8007-ebc267875bd4"
 
 [compat]

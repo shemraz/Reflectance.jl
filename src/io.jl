@@ -1,13 +1,13 @@
 import FileIO
 import ImageCore
-using Chain: @chain as @>
+using Chain
 import JSON3
 
 include("types.jl")
 include("utils.jl")
 
 function parse_plane(path::String)::Array{Float64,3}
-    @> path begin
+    @chain path begin
         FileIO.load
         ImageCore.channelview
         @. Float64
@@ -18,14 +18,14 @@ end
 function loaddir(dir::String, B::Type{T}) where T <: Basis
     contents = readdir(dir; join=true)
     plane_files = filter(it -> endswith(it, ".jpg"), contents)
-    info_file = @> filter(it -> contains(it, "info.json"), contents) first
+    info_file = @chain filter(it -> contains(it, "info.json"), contents) first
 
-    spec = @> info_file begin
+    spec = @chain info_file begin
         read(String)
         JSON3.read(B)
     end
 
-    dequantised = @> plane_files begin
+    dequantised = @chain plane_files begin
         map(parse_plane, _)
         cat(_...; dims=1)
         dequant(spec.materials[1])

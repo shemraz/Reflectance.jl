@@ -1,4 +1,4 @@
-using Chain: @chain as @>
+using Chain
 using Base.Iterators
 
 # TODO: Refactor legacy methods
@@ -19,7 +19,7 @@ struct PTM
 end
 
 function header!(io::IO)::Vector{Any}
-    @> eachline(io) begin
+    @chain eachline(io) begin
         first(_, 6)
         vcat(
             first(_, 2),
@@ -38,7 +38,7 @@ function pixels!(io::IO, width::Int, height::Int, planes::Int)::AbstractArray
     raw = Vector{UInt8}(undef, n)
     readbytes!(io, raw)
 
-    @> raw begin
+    @chain raw begin
         reshape(planes, width, height)
         permutedims((1, 2, 3))
     end

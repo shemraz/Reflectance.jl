@@ -1,5 +1,5 @@
-using Reflectance
 using Test
+using Reflectance
 
 @testset "reading relight format" begin
     rl = loaddir("relight-ptm/", PTM)    

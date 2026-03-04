@@ -3,7 +3,7 @@ import ImageCore
 using Chain
 import JSON3
 
-include("types.jl")
+include("types/Relightable.jl")
 include("utils.jl")
 
 function parse_plane(path::String)::Array{Float64,3}
@@ -15,7 +15,7 @@ function parse_plane(path::String)::Array{Float64,3}
 end
 
 
-function loaddir(dir::String, B::Type{T}) where T <: Basis
+function loaddir(dir::String, B::Type{T}) where T <: AbstractBasis
     contents = readdir(dir; join=true)
     plane_files = filter(it -> endswith(it, ".jpg"), contents)
     info_file = @chain filter(it -> contains(it, "info.json"), contents) first

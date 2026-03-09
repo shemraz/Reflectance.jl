@@ -12,10 +12,10 @@ function loaddir(dir::String, Basis::Type{T}) where T <: AbstractBasis
     plane_files = filter(it -> endswith(it, ".jpg"), contents)
 
     metadata = JSON3.read(joinpath(dir, "info.json"), Metadata)
-    planes = readplanes(dir)
+    planes = read_planes!(dir)
 
     dequantised = @chain plane_files begin
-        map(readplanes, _)
+        map(read_planes!, _)
         cat(_...; dims=1)
         dequantise(metadata.materials[1])
     end

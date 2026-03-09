@@ -10,14 +10,14 @@ include("BLN.jl")
 include("YCC.jl")
 
 struct Metadata
-    width::Int32
-    height::Int32
+    width::Integer
+    height::Integer
     format::String
     type::String
     colorspace::String
-    nplanes::Int8
+    nplanes::Integer
     materials::Vector{Dict{Symbol, Vector{Float64}}}
-    quality::Int8
+    quality::Integer
     sigma::Union{Nothing,Float64}
     lights::Union{Nothing,Vector{Float64}}
     basis::Union{Nothing,Vector{Int8}}

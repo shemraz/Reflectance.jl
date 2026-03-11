@@ -1,14 +1,18 @@
 module Reflectance
 
+import FileIO, ImageIO
+import ImageCore
+import JSON3
+using Glob, Chain, InteractiveUtils
+
 # Submodules
-include("io.jl")
-include("transform.jl")
+include("Core.jl")
 
 # Public types
-export Relightable, AbstractBasis
-export PTM, HSH, RBF, BLN, YCC
+export AbstractBasis
+export PTM
 
 # Public methods
-export loaddir, light
+export load
 
 end

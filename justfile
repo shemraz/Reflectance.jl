@@ -16,3 +16,6 @@ info:
     open --raw "test/ptm/info.json"
 
 alias i := info
+
+@edit:
+    helix (ls src/**/*.jl | input list | get name)

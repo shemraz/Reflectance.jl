@@ -1,3 +1,3 @@
-struct BLN <: AbstractBasis
+struct BLN <: Basis
     planes::Vector{Int8}
 end

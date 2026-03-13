@@ -1,6 +1,5 @@
-struct PTM{S,T,N} <: AbstractBasis{S,Float64,3}
-    model::Array{Float64,3} # Dequantised array of RGB and coefficient values.
-    dims::NTuple{N,Int}
+struct PTM <: Basis{Float64,3}
+    data::Array{Float64,3} # Dequantised array of RGB and coefficient values.
 end
 
 function PTM(
@@ -13,7 +12,7 @@ function PTM(
         values
     end
     dequantise!(A, scale, bias)
-    return PTM(A, ())
+    return PTM(A)
 end
 
 function dequantise!(A::Array{Float64,3}, scale::Vector{Float64}, bias::Vector{Float64})::Array{Float64,3}

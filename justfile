@@ -19,3 +19,5 @@ alias i := info
 
 @edit:
     helix (ls src/**/*.jl | input list | get name)
+
+alias e := edit

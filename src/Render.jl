@@ -3,7 +3,7 @@
 
 Simulate a texture map at the given incident light vector.
 """
-function light(surface::AbstractBasis}, direction::Tuple{Float64,Float64})
+function light(surface::Basis}, direction::Tuple{Float64,Float64})
     l(u, v, a) = a[1] * u^2 + a[2] * v^2 + a[3] * u * v + a[4] * u + a[5] * v + a[6]
     luma = @chain begin
         map(eachslice(surface.planes; dims=(2,3))) do plane

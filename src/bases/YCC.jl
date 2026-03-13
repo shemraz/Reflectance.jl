@@ -1,3 +1,3 @@
-struct YCC{Basis<:AbstractBasis} <: AbstractBasis
-    basis::Basis
+struct YCC{B<:Basis} <: Basis
+    basis::B
 end

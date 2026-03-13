@@ -1,15 +1,22 @@
 # Bases
-abstract type AbstractBasis end
+abstract type AbstractBasis{S,T,N} <: AbstractArray{T,N} end
+
+Base.size(A::T) where T <: AbstractBasis = size(A.data)
+Base.getindex(A::T, i::Int64) where T <: AbstractBasis = A.data[i]
 
 include("bases/PTM.jl")
-include("bases/HSH.jl")
-include("bases/RBF.jl")
-include("bases/BLN.jl")
-include("bases/YCC.jl")
+# include("bases/HSH.jl")
+# include("bases/RBF.jl")
+# include("bases/BLN.jl")
+# include("bases/YCC.jl")
 
 function load_channels(file::String)::Array{Float64,3}
     # Load plane into 1×H×W array.
     FileIO.load(file) |> ImageCore.channelview
+end
+
+function load_metadata(dir::String)::JSON3.Object
+    joinpath(dir, "info.json") |> JSON3.read
 end
 
 function getplanes(
@@ -29,6 +36,6 @@ function load(
     files::Vector{String} = glob("plane_*.jpg", dir)
     model::Array{Float64,3} = getplanes(files) # Load planes into an array.
     # Read metadata from `info.json`.
-    metadata = joinpath(dir, "info.json") |> JSON3.read
+    metadata = load_metadata(dir)
     basis(model, metadata)
 end

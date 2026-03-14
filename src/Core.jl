@@ -33,8 +33,8 @@ function load(
 )::T where T <: Basis
     # Glob list of plane files in directory.
     files::Vector{String} = glob("plane_*.jpg", dir)
-    model::Array{Float64,3} = getplanes(files) # Load planes into an array.
-    # Read metadata from `info.json`.
-    metadata = load_metadata(dir)
-    basis(model, metadata)
+    if isempty(files)
+        throw(ArgumentError("No JPEGs exist at given path: " * dir))
+    end
+    basis(getplanes(files), load_metadata(dir))
 end

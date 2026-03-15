@@ -1,8 +1,13 @@
 using Test
 using Reflectance
+using Glob
 
 @testset "Performance" begin
-    @time Reflectance.load(PTM, "ptm/")
+    @showtime Reflectance.load(PTM, "ptm/")
+    A = @showtime Reflectance.load_channels("ptm/plane_0.jpg")
+    m = @showtime Reflectance.load_metadata("ptm/")
+    @showtime glob("plane_*.jpg", "ptm/")
+    @showtime PTM(A, m)
 end
 
 @testset "PTM" begin

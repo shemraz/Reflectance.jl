@@ -1,6 +1,6 @@
 module Reflectance
 
-import FileIO, ImageIO
+import FileIO, ImageIO, FixedPointNumbers
 import ImageCore
 import JSON3
 using StaticArraysCore

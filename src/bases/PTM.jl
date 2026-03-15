@@ -2,6 +2,9 @@ struct PTM <: Basis{Float64,3}
     data::Array{Float64,3} # Dequantised array of RGB and coefficient values.
 end
 
+Base.size(A::PTM) = size(A.data)
+Base.getindex(A::PTM, I...) = getindex(A.data, I...)
+
 function PTM(
     A::Array{Float64,3}, # Array of quantised RGB and coefficient values.
     metadata::JSON3.Object

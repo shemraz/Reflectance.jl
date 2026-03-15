@@ -1,5 +1,10 @@
 set shell := [ "nu", "-c" ]
 
+# Aliases
+alias j := jl
+alias e := edit
+alias i := info
+
 default:
   @just --choose
 
@@ -15,9 +20,5 @@ test:
 info:
     open --raw "test/ptm/info.json"
 
-alias i := info
-
 @edit:
     helix (ls src/**/*.jl | input list | get name)
-
-alias e := edit

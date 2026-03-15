@@ -6,7 +6,8 @@ using Glob
     @showtime Reflectance.load(PTM, "ptm/")
     A = @showtime Reflectance.load_channels("ptm/plane_0.jpg")
     m = @showtime Reflectance.load_metadata("ptm/")
-    @showtime glob("plane_*.jpg", "ptm/")
+    jpgs = @showtime glob("plane_*.jpg", "ptm/")
+    @showtime Reflectance.getplanes(jpgs)
     @showtime PTM(A, m)
 end
 

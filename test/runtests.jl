@@ -11,14 +11,19 @@ metadata = Reflectance.load_metadata(data)
 m_size = (metadata.nplanes, metadata.height, metadata.width)
 n_jpegs = length(glob("plane_*.jpg", data))
 
+@testset "Render" begin
+    result = render(ptm9, [0.5,0.5])
+    save("images/result_ptm9.jpg", result)
+end
+
 @testset "Metadata" begin
     @test metadata.nplanes ==  n_jpegs * 3
 end
 
 @testset "Basis interface" begin
     @test ptm9 isa PTM
-    @test typeof(ptm9) <: Basis
-    @test size(ptm9) == m_size
+    @test typeof(ptm9) <: AbstractBasis
+    @test size(ptm9) == (m_size[2:end]...)
 end
 
 @testset "Performance" begin

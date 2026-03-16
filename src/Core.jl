@@ -1,5 +1,5 @@
 # Bases
-abstract type Basis{T,N} <: AbstractArray{T,N} end
+abstract type AbstractBasis{T,N} <: AbstractArray{T,N} end
 
 include("bases/PTM.jl")
 
@@ -45,7 +45,7 @@ TBW
 function relightable(
     basis::Type{T},
       dir::String
-)::T where T <: Basis
+)::T where T <: AbstractBasis
     # Glob list of plane files in directory.
     files::Vector{String} = glob("plane_*.jpg", dir)
 

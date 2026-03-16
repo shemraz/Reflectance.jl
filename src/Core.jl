@@ -10,34 +10,39 @@ include("bases/PTM.jl")
 ## include("bases/YCC.jl")
 
 function load_channels!(file::String, buffer::AbstractArray{Float64,3})::Nothing
-    # Load plane into view of NxHxW array.
-    buffer .= reinterpret(reshape, FixedPointNumbers.N0f8, FileIO.load(file))
+    # Load plane into view of N×H×W array.
+    buffer .= Float64.(reinterpret(reshape, FixedPointNumbers.N0f8, FileIO.load(file)))
     return nothing
 end
 
 function load_metadata(dir::String)::JSON3.Object
+    # Load metadata as a JSON object.
     joinpath(dir, "info.json") |> JSON3.read
 end
 
 function getplanes(
-    files::Vector{String}, # A list of JPEGs.
+    files::Vector{String},
     dims::NTuple{3,Int}
  )::Array{Float64,3}
-
+    # Iterate over planes, loading channels into an array along the first dimension.
     A = Array{Float64, 3}(undef, dims)
 
     @inbounds for (n, file) in enumerate(files)
         planes3 = (3n-2):3n
         load_channels!(file, view(A, planes3, :, :))
     end
-    # cat(
-    #     load_channels.(files)...;
-    #     dims=1
-    # )
     return A
 end
 
-function load(
+"""
+    relightable(
+        basis::Type{T},
+          dir::String
+    )::T where T <: Basis
+
+TBW
+"""
+function relightable(
     basis::Type{T},
       dir::String
 )::T where T <: Basis

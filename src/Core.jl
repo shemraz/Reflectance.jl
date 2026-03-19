@@ -8,9 +8,9 @@ include("bases/PTM.jl")
 ## include("bases/BLN.jl")
 ## include("bases/YCC.jl")
 
-function readplanes!(buffer::AbstractArray{Float64,3}, file::String)::Nothing
+function readplanes!(buffer::AbstractArray{T,3}, file::String)::Nothing where T <: Real
     # Load plane into view of N×H×W array.
-    buffer .= Float64.(reinterpret(reshape, FixedPointNumbers.N0f8, FileIO.load(file)))
+    buffer .= T.(reinterpret(reshape, FixedPointNumbers.N0f8, FileIO.load(file)))
     return nothing
 end
 
@@ -38,12 +38,12 @@ function Relightable(Basis::Type{T}, dir::String)::T where T <: AbstractBasis
     end
 
     # Iterate over planes, loading slices into an array along the first dimension.
-    A = Array{Float64, 3}(undef, (info.nplanes, info.height, info.width))
+    buffer = Array{Float32, 3}(undef, (info.nplanes, info.height, info.width))
 
     @inbounds for (n, file) in enumerate(files)
         nslices = (3n - 2):3n # Take 3 slices at a time.
-        readplanes!(view(A, nslices, :, :), file)
+        readplanes!(view(buffer, nslices, :, :), file)
     end
 
-    return Basis(A, info)
+    return Basis(buffer, info)
 end

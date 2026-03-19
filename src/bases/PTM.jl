@@ -7,10 +7,7 @@ Base.size(A::PTM) = size(A.data)
 Base.getindex(A::PTM, I...) = getindex(A.data, I...)
 
 """
-    PTM(
-        A::Array{Float64,3},
-        metadata::JSON3.Object
-    )
+    PTM(A::Array{T,3}, metadata::JSON3.Object)::PTM{T} where T <: Real
 
 Construct a polynomial texture map. Returns an N×H×W array, where:
 
@@ -19,7 +16,7 @@ Construct a polynomial texture map. Returns an N×H×W array, where:
 """
 function PTM(A::Array{T,3}, metadata::JSON3.Object)::PTM{T} where T <: Real
     # Get scale and bias vectors from JSON metadata.
-    scale::Vector{Float64}, bias::Vector{Float64} = begin
+    scale::Vector{T}, bias::Vector{T} = begin
         getproperty(metadata, :materials) |> first |> values
     end
     dequantise!(A, scale, bias) # Dequantise coefficients before constructing PTM.
@@ -27,14 +24,14 @@ function PTM(A::Array{T,3}, metadata::JSON3.Object)::PTM{T} where T <: Real
 end
 
 """
-    dequantise!(A::Array{Float64,3}, scale::Vector{Float64}, bias::Vector{Float64})::Array{Float64,3}
+    dequantise!(A::Array{T,3}, scale::Vector{T}, bias::Vector{T})::Array{T,3} where T <: Real
 
 Dequantise coefficient values, whereby:
 
-    ``A\\_{n,i,j} = scale\\_{n} * A\\_{n,i,j} + bias\\_{n}``
+    ``A\_{n,i,j} = scale\_{n} * A\_{n,i,j} + bias\_{n}``
 
 """
-function dequantise!(A::Array{Float64,3}, scale::Vector{Float64}, bias::Vector{Float64})::Array{Float64,3}
+function dequantise!(A::Array{T,3}, scale::Vector{T}, bias::Vector{T})::Array{T,3} where T <: Real
     # Iterate over first dimension of A.
     nplanes, _ = size(A)
     for i ∈ 1:nplanes

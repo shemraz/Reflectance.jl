@@ -1,59 +1,49 @@
 # Bases
 abstract type AbstractBasis{T,N} <: AbstractArray{T,N} end
 
-include("bases/PTM.jl")
-
 # TODO:
+include("bases/PTM.jl")
 ## include("bases/HSH.jl")
 ## include("bases/RBF.jl")
 ## include("bases/BLN.jl")
 ## include("bases/YCC.jl")
 
-function load_channels!(file::String, buffer::AbstractArray{Float64,3})::Nothing
+function readplanes!(buffer::AbstractArray{Float64,3}, file::String)::Nothing
     # Load plane into view of N×H×W array.
     buffer .= Float64.(reinterpret(reshape, FixedPointNumbers.N0f8, FileIO.load(file)))
     return nothing
 end
 
-function load_metadata(dir::String)::JSON3.Object
+function readinfo(dir::String)::JSON3.Object
     # Load metadata as a JSON object.
-    joinpath(dir, "info.json") |> JSON3.read
-end
-
-function getplanes(
-    files::Vector{String},
-    dims::NTuple{3,Int}
- )::Array{Float64,3}
-    # Iterate over planes, loading channels into an array along the first dimension.
-    A = Array{Float64, 3}(undef, dims)
-
-    @inbounds for (n, file) in enumerate(files)
-        planes3 = (3n-2):3n
-        load_channels!(file, view(A, planes3, :, :))
+    file = joinpath(dir, "info.json")
+    if !ispath(file)
+        throw(ArgumentError("No `info.json` exists at given path: " * file))
     end
-    return A
+    return JSON3.read(file)
 end
 
 """
-    relightable(
-        basis::Type{T},
-          dir::String
-    )::T where T <: Basis
+    Relightable(Basis::Type{T}, dir::String)::T where T <: AbstractBasis
 
-TBW
+Load a directory into a relightable image basis.
 """
-function relightable(
-    basis::Type{T},
-      dir::String
-)::T where T <: AbstractBasis
+function Relightable(Basis::Type{T}, dir::String)::T where T <: AbstractBasis
     # Glob list of plane files in directory.
     files::Vector{String} = glob("plane_*.jpg", dir)
+    info = readinfo(dir)
 
-    if isempty(files) 
+    if isempty(files)
         throw(ArgumentError("No JPEGs exist at given path: " * dir))
     end
 
-    m = load_metadata(dir)
-    dims = (m.nplanes, m.height, m.width)
-    basis(getplanes(files, dims), m)
+    # Iterate over planes, loading slices into an array along the first dimension.
+    A = Array{Float64, 3}(undef, (info.nplanes, info.height, info.width))
+
+    @inbounds for (n, file) in enumerate(files)
+        nslices = (3n - 2):3n # Take 3 slices at a time.
+        readplanes!(view(A, nslices, :, :), file)
+    end
+
+    return Basis(A, info)
 end

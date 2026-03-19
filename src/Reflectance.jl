@@ -1,9 +1,7 @@
 module Reflectance
 
-import FileIO, FixedPointNumbers
-using ImageCore
-import JSON3
-using Glob, Chain, InteractiveUtils
+import FileIO, FixedPointNumbers, JSON3
+using ImageCore, Glob, InteractiveUtils
 
 # Submodules
 include("Core.jl")
@@ -14,7 +12,7 @@ export AbstractBasis
 export PTM
 
 # Public methods
-export relightable
+export Relightable
 export render
 
 end

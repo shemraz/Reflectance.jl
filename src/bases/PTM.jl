@@ -17,15 +17,10 @@ Construct a polynomial texture map. Returns an N×H×W array, where:
     A[:, i, j] == [r, g, b, a₀, a₁, ..., a₅]
 
 """
-function PTM(
-    A::Array{T,3}, # Array of normalised RGB and coefficient values.
-    metadata::JSON3.Object
-)::PTM{T} where T
+function PTM(A::Array{T,3}, metadata::JSON3.Object)::PTM{T} where T <: Real
     # Get scale and bias vectors from JSON metadata.
-    scale::Vector{Float64}, bias::Vector{Float64} = @chain metadata begin
-        getproperty(:materials)
-        first
-        values
+    scale::Vector{Float64}, bias::Vector{Float64} = begin
+        getproperty(metadata, :materials) |> first |> values
     end
     dequantise!(A, scale, bias) # Dequantise coefficients before constructing PTM.
     return PTM{T}(A)
@@ -36,7 +31,7 @@ end
 
 Dequantise coefficient values, whereby:
 
-    Aₙ,ᵢ,ⱼ = scaleₙ * Aₙ,ᵢ,ⱼ + biasₙ
+    ``A\\_{n,i,j} = scale\\_{n} * A\\_{n,i,j} + bias\\_{n}``
 
 """
 function dequantise!(A::Array{Float64,3}, scale::Vector{Float64}, bias::Vector{Float64})::Array{Float64,3}

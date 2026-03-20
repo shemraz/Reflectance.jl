@@ -1,4 +1,2 @@
-/Manifest.toml
-*.ptm
-*.png
-justfile
+Manifest.toml
+test/images

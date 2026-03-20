@@ -28,7 +28,7 @@ end
 
 Dequantise coefficient values, whereby:
 
-    ``A\_{n,i,j} = scale\_{n} * A\_{n,i,j} + bias\_{n}``
+    ``A_{n,i,j} = scale_{n} * A_{n,i,j} + bias_{n}``
 
 """
 function dequantise!(A::Array{T,3}, scale::Vector{T}, bias::Vector{T})::Array{T,3} where T <: Real
@@ -42,3 +42,4 @@ function dequantise!(A::Array{T,3}, scale::Vector{T}, bias::Vector{T})::Array{T,
 end
 
 dequantize!::Function = dequantise! # Alias for American-English spelling.
+

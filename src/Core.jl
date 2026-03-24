@@ -1,5 +1,5 @@
 # Bases
-abstract type AbstractBasis{T,N} <: AbstractArray{T,N} end
+abstract type AbstractBasis{T,N} end
 
 # TODO:
 include("bases/PTM.jl")
@@ -23,12 +23,9 @@ function readinfo(dir::String)::JSON3.Object
     return JSON3.read(file)
 end
 
-"""
-    Relightable(Basis::Type{T}, dir::String)::T where T <: AbstractBasis
+const Relightable = Tuple{Matrix{AbstractRGB{T}}, B} where T <: Real where B <: AbstractBasis
 
-Load a directory into a relightable image basis.
-"""
-function Relightable(Basis::Type{T}, dir::String)::T where T <: AbstractBasis
+function planes(Basis::Type{T}, planes::Vector{String}...; dims::Tuple{Int, Int, Int}, materials::Union{Vector{Any}, Nothing})::T where T <: AbstractBasis
     # Glob list of plane files in directory.
     files::Vector{String} = glob("plane_*.jpg", dir)
     info = readinfo(dir)
@@ -45,5 +42,7 @@ function Relightable(Basis::Type{T}, dir::String)::T where T <: AbstractBasis
         readplanes!(view(buffer, nslices, :, :), file)
     end
 
-    return Basis(buffer, info)
+    return Basis(buffer, materials...)
 end
+
+function planes(Basis::Type{T}, planes...; materials::Vector{Any})

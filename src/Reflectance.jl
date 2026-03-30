@@ -1,7 +1,7 @@
 module Reflectance
 
-import FileIO, FixedPointNumbers, JSON3, JpegTurbo
-using ImageCore, Glob, InteractiveUtils, StructTypes
+import JSON3, JpegTurbo
+using ImageCore, Glob, StructTypes
 
 # Submodules
 include("Core.jl")
@@ -13,6 +13,6 @@ export PTM
 
 # Public methods
 export loaddir
-export render
+export light
 
 end

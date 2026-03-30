@@ -20,7 +20,7 @@ function light(A::PTM, l::NTuple{3, <: Real})::Matrix{Float64}
     # Initialise transformation matrix.
     T = Matrix{Float64}(undef, (h, w))
     
-        # Loop over pixels
+    # Loop over pixels
     for i ∈ 1:h, j ∈ 1:w
         T[i, j] = L(view(A.data, :, i, j), lᵤ, lᵥ)
     end

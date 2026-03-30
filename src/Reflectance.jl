@@ -1,7 +1,7 @@
 module Reflectance
 
 import FileIO, FixedPointNumbers, JSON3, JpegTurbo
-using ImageCore, Glob, InteractiveUtils
+using ImageCore, Glob, InteractiveUtils, StructTypes
 
 # Submodules
 include("Core.jl")

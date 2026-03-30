@@ -14,9 +14,9 @@ Construct a polynomial texture map. Returns an N×H×W array, where:
     A[:, i, j] == [r, g, b, a₀, a₁, ..., a₅]
 
 """
-function PTM(A::Array{T,3}, scale::Vector{AbstractFloat}, bias::Vector{AbstractFloat})::PTM{T} where T <: Real
+function PTM(A::Array{T,3}, material::Material)::PTM{T} where T <: Real
     # Get scale and bias vectors from JSON metadata.
-    dequantise!(A, scale, bias) # Dequantise coefficients before constructing PTM.
+    dequantise!(A, material.scale, material.bias) # Dequantise coefficients before constructing PTM.
     return PTM{T}(A)
 end
 

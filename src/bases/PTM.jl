@@ -1,39 +1,23 @@
-struct PTM{T} <: AbstractBasis{T,3}
-    data::Array{T,3} # Dequantised array of RGB and coefficient values.
+struct PTM <: AbstractBasis
+    data::Array{Float64,3} # Dequantised array of RGB and coefficient values.
 end
 
 # Implement array-like behaviour.
 Base.size(A::PTM) = size(A.data)
 Base.getindex(A::PTM, I...) = getindex(A.data, I...)
 
-"""
-    PTM(A::Array{T,3}, metadata::JSON3.Object)::PTM{T} where T <: Real
-
-Construct a polynomial texture map. Returns an N×H×W array, where:
-
-    A[:, i, j] == [r, g, b, a₀, a₁, ..., a₅]
-
-"""
-function PTM(A::Array{T,3}, material::Material)::PTM{T} where T <: Real
+function PTM(A::Array{T,3}, material::Material)::PTM where T <: Real
     # Get scale and bias vectors from JSON metadata.
     dequantise!(A, material.scale, material.bias) # Dequantise coefficients before constructing PTM.
-    return PTM{T}(A)
+    return PTM(A)
 end
 
-"""
-    dequantise!(A::Array{T,3}, scale::Vector{T}, bias::Vector{T})::Array{T,3} where T <: Real
-
-Dequantise coefficient values, whereby:
-
-    ``A_{n,i,j} = scale_{n} * A_{n,i,j} + bias_{n}``
-
-"""
-function dequantise!(A::Array{T,3}, scale::Vector{T}, bias::Vector{T})::Array{T,3} where T <: Real
+function dequantise!(A::Array{T,3}, scale::Vector{Float64}, bias::Vector{Float64})::Array{Float64,3} where T <: Real
     # Iterate over first dimension of A.
     nplanes, _ = size(A)
     for i ∈ 1:nplanes
-        A[i,:,:] .-= bias[i] # Subtract bias.
-        A[i,:,:] .*= scale[i] # Multiply 2-D plane by corresponding scalar.
+        A[i,:,:] .-= bias[i+3] # Subtract bias.
+        A[i,:,:] .*= scale[i+3] # Multiply 2-D plane by corresponding scalar.
     end
     return A
 end

@@ -18,7 +18,7 @@ test:
     julia --project=. --interactive -e "import Pkg; Pkg.test()"
 
 info:
-    open --raw "test/ptm/info.json"
+    open --raw "test/data/ptm/info.json"
 
 @edit:
     helix (ls src/**/*.jl | input list | get name)

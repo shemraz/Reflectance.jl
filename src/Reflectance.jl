@@ -1,6 +1,6 @@
 module Reflectance
 
-import FileIO, FixedPointNumbers, JSON3
+import FileIO, FixedPointNumbers, JSON3, JpegTurbo
 using ImageCore, Glob, InteractiveUtils
 
 # Submodules
@@ -12,7 +12,7 @@ export AbstractBasis
 export PTM
 
 # Public methods
-export Relightable
+export loaddir
 export render
 
 end

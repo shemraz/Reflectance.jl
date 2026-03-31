@@ -1,18 +1,22 @@
+# Reflectance.jl
 module Reflectance
 
-import FileIO, FixedPointNumbers, JSON3
-using ImageCore, Glob, InteractiveUtils
+import JSON3, JpegTurbo
+using ImageCore, Glob, StructTypes
 
-# Submodules
+## Submodules
+### Core
 include("Core.jl")
-include("Render.jl")
-
-# Public types
 export AbstractBasis
-export PTM
+export loaddir
 
-# Public methods
-export Relightable
-export render
+### Bases
+include("bases/PTM.jl")
+export PTM
+export dequantise!, dequantize!
+
+### Rendering methods
+include("Render.jl")
+export light
 
 end

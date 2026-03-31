@@ -1,40 +1,62 @@
-struct PTM{T} <: AbstractBasis{T,3}
-    data::Array{T, 3} # Dequantised array of RGB and coefficient values.
+# bases/PTM.jl
+
+## Basis type and constructor.
+struct PTM <: AbstractBasis
+    data::Array{Float64,3} # Dequantised array of RGB and coefficient values.
 end
 
-# Implement array-like behaviour.
+"""
+    PTM(A::Array{T,3}, material::Material)::PTM where T <: Real
+
+Construct a polynomial texture map from a 3-dimensional array of **quantised** coefficients.
+
+A `Material` containing scale and bias vectors must be provided to dequantise the
+coefficients.
+
+See also [`loaddir`](@loaddir), [`dequantise!`/`dequantize!`](@dequantise!).
+"""
+function PTM(A::Array{T,3}, material::Material)::PTM where T <: Real
+    # Dequantise coefficients before constructing PTM.
+    dequantise!(
+        A,
+        @view(material.scale[4:end]),
+        @view(material.bias[4:end])
+    ) 
+    return PTM(A)
+end
+
+"""
+    PTM(A::Array{T,3})::PTM where T <: Real
+
+Construct a polynomial texture map from a 3-dimensional array of **dequantised**
+coefficients.
+
+The array must be manually dequantised before construction.
+
+See also [`dequantise!`/`dequantize!`](@dequantise!), [`loaddir`](@loaddir).
+"""
+function PTM(A::Array{T,3})::PTM where T <: Real
+    return PTM(A)
+end
+
+## Implements array-like behaviour.
 Base.size(A::PTM) = size(A.data)
 Base.getindex(A::PTM, I...) = getindex(A.data, I...)
+### TODO: Add Base.show method.
 
 """
-    PTM(A::Array{T,3}, metadata::JSON3.Object)::PTM{T} where T <: Real
+    dequantise!(A::Array{T,3}, scale::AbstractVector{<:Real}, bias::AbstractVector{<:Real}) where T <: Real
 
-Construct a polynomial texture map. Returns an N×H×W array, where:
+Dequantise coefficients in-place by subtracting bias and applying scale.
 
-    A[:, i, j] == [r, g, b, a₀, a₁, ..., a₅]
+Each plane `i` of `A` is transformed as `(A[i,:,:] .- bias[i]) .* scale[i]`.
+Vectors `scale` and `bias` must have length equal to the first dimension of `A`.
 
+See also [`dequantize!`](@dequantize!) for the American-English spelling alias.
 """
-function PTM(A::Array{T,3}, metadata::JSON3.Object)::PTM{T} where T <: Real
-    # Get scale and bias vectors from JSON metadata.
-    scale::Vector{T}, bias::Vector{T} = begin
-        getproperty(metadata, :materials) |> first |> values
-    end
-    dequantise!(A, scale, bias) # Dequantise coefficients before constructing PTM.
-    return PTM{T}(A)
-end
-
-"""
-    dequantise!(A::Array{T,3}, scale::Vector{T}, bias::Vector{T})::Array{T,3} where T <: Real
-
-Dequantise coefficient values, whereby:
-
-    ``A_{n,i,j} = scale_{n} * A_{n,i,j} + bias_{n}``
-
-"""
-function dequantise!(A::Array{T,3}, scale::Vector{T}, bias::Vector{T})::Array{T,3} where T <: Real
+function dequantise!(A::Array{T,3}, scale::AbstractVector{<:Real}, bias::AbstractVector{<:Real})::Array{Float64,3} where T <: Real
     # Iterate over first dimension of A.
-    nplanes, _ = size(A)
-    for i ∈ 1:nplanes
+    @views for i ∈ axes(A, 1)
         A[i,:,:] .-= bias[i] # Subtract bias.
         A[i,:,:] .*= scale[i] # Multiply 2-D plane by corresponding scalar.
     end
@@ -42,3 +64,4 @@ function dequantise!(A::Array{T,3}, scale::Vector{T}, bias::Vector{T})::Array{T,
 end
 
 dequantize!::Function = dequantise! # Alias for American-English spelling.
+

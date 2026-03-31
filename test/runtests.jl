@@ -1,15 +1,37 @@
-using Reflectance
 using Test
+using Reflectance
+using Glob
+using BenchmarkTools
+using ImageCore
+using FileIO
 
-@testset "Reflectance.jl" begin
-    rl = loaddir("relight-ptm/", PTM)    
-    v = (0.0, 1.0)
-    res = light(rl, v)
-    # Dimensions are (p, h, w)
-    coeff_n, coeff_h, coeff_w = size(rl.planes)
-    rgb_n, rgb_h, rgb_w = size(rl.rgb)
-    @test rl.spec.height == coeff_h == rgb_h
-    @test rl.spec.width == coeff_w == rgb_w
-    @test rl.spec.nplanes == coeff_n + rgb_n
-    @test size(res) == (rgb_h, rgb_w)
+data = "data/ptm"
+ptm9 = relightable(PTM, data)
+metadata = Reflectance.load_metadata(data)
+m_size = (metadata.nplanes, metadata.height, metadata.width)
+n_jpegs = length(glob("plane_*.jpg", data))
+
+@testset "Render" begin
+    result = render(ptm9, [0.5,0.5])
+    save("images/result_ptm9.jpg", result)
+end
+
+@testset "Metadata" begin
+    @test metadata.nplanes ==  n_jpegs * 3
+end
+
+@testset "Basis interface" begin
+    @test ptm9 isa PTM
+    @test typeof(ptm9) <: AbstractBasis
+    @test size(ptm9) == (m_size[2:end]...)
+end
+
+@testset "Performance" begin
+    @btime relightable(PTM, data) samples=5
+    @btime Reflectance.getplanes(glob("plane_*.jpg", data), m_size) samples=5
+    @btime Reflectance.load_channels!("$data/plane_0.jpg", Array{Float64,3}(undef, (3, m_size[2], m_size[3])))
+end
+
+@testset "Image" begin
+    img = reinterpret(reshape, RGB{Float64}, ptm9[1:3,:,:])
 end

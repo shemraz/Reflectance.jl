@@ -1,6 +1,11 @@
-# Bases
-abstract type AbstractBasis end
+# Core.jl
 
+## Core types used by all relightables.
+
+### Supertype of all bases.
+abstract type AbstractBasis end 
+
+### Used to dequantise planes.
 struct Material
     scale::Vector{Float64}
     bias::Vector{Float64}
@@ -16,10 +21,13 @@ struct Metadata
     quality::Int
     materials::Vector{Material}
 end
+
+### Data in `info.json` is read directly into a Metadata struct.
 Metadata(file::String)::Metadata = JSON3.read(file, Metadata)
+
 StructTypes.StructType(::Type{Metadata}) = StructTypes.Struct()
 
-include("bases/PTM.jl")
+## IO methods used to read image data into bases.
 
 function readplanes!(buffer::AbstractArray{T,3}, file::String, scale::Real)::Nothing where T <: Real
     # Load plane into view of N×H×W array.
@@ -35,10 +43,27 @@ function readplanes!(buffer::Array{T,3}, files::Vector{String}, scale::Real)::No
     end
 end
 
+### API
 """
-    loaddir(basis::Type{T}, dir::String)::T where T <: AbstractBasis
+    loaddir(Basis::Type{T}, dir::String; scale::Real = 1)::Tuple{AbstractMatrix,T} where T <: AbstractBasis
 
-Load a directory into a relightable image basis.
+Load a base image and basis model from a [Relight](https://github.com/cnr-isti-vclab/relight) directory structure.
+
+Parses `info.json` for metadata, decodes the base image, and loads plane data into
+a buffer. The buffer and material properties are passed to the a constructor for
+basis-specific processing.
+
+# Arguments
+- `Basis`: Concrete subtype of `AbstractBasis` to construct (e.g., [`PTM`](@PTM)).
+- `dir`: Directory path containing `info.json`, base image, and plane files.
+- `scale`: Optional spatial downsampling ratio for height and width (default 1).
+
+# Returns
+A tuple containing:
+- The base image as a `Matrix{<:AbstractRGB}`.
+- The constructed `Basis` instance populated with all non-RGB planes.
+
+See also [`PTM`](@PTM).
 """
 function loaddir(Basis::Type{T}, dir::String; scale::Real = 1)::Tuple{AbstractMatrix,T} where T <: AbstractBasis
     # Glob list of plane files in directory.

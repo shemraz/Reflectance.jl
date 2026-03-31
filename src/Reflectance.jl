@@ -1,18 +1,22 @@
+# Reflectance.jl
 module Reflectance
 
 import JSON3, JpegTurbo
 using ImageCore, Glob, StructTypes
 
-# Submodules
+## Submodules
+### Core
 include("Core.jl")
-include("Render.jl")
-
-# Public types
 export AbstractBasis
-export PTM
-
-# Public methods
 export loaddir
+
+### Bases
+include("bases/PTM.jl")
+export PTM
+export dequantise!, dequantize!
+
+### Rendering methods
+include("Render.jl")
 export light
 
 end

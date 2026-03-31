@@ -1,23 +1,64 @@
+# bases/PTM.jl
+
+## Basis type and constructor.
 struct PTM <: AbstractBasis
     data::Array{Float64,3} # Dequantised array of RGB and coefficient values.
 end
 
-# Implement array-like behaviour.
-Base.size(A::PTM) = size(A.data)
-Base.getindex(A::PTM, I...) = getindex(A.data, I...)
+"""
+    PTM(A::Array{T,3}, material::Material)::PTM where T <: Real
 
+Construct a polynomial texture map from a 3-dimensional array of **quantised** coefficients.
+
+A `Material` containing scale and bias vectors must be provided to dequantise the
+coefficients.
+
+See also [`loaddir`](@loaddir), [`dequantise!`/`dequantize!`](@dequantise!).
+"""
 function PTM(A::Array{T,3}, material::Material)::PTM where T <: Real
-    # Get scale and bias vectors from JSON metadata.
-    dequantise!(A, material.scale, material.bias) # Dequantise coefficients before constructing PTM.
+    # Dequantise coefficients before constructing PTM.
+    dequantise!(
+        A,
+        @view(material.scale[4:end]),
+        @view(material.bias[4:end])
+    ) 
     return PTM(A)
 end
 
-function dequantise!(A::Array{T,3}, scale::Vector{Float64}, bias::Vector{Float64})::Array{Float64,3} where T <: Real
+"""
+    PTM(A::Array{T,3})::PTM where T <: Real
+
+Construct a polynomial texture map from a 3-dimensional array of **dequantised**
+coefficients.
+
+The array must be manually dequantised before construction.
+
+See also [`dequantise!`/`dequantize!`](@dequantise!), [`loaddir`](@loaddir).
+"""
+function PTM(A::Array{T,3})::PTM where T <: Real
+    return PTM(A)
+end
+
+## Implements array-like behaviour.
+Base.size(A::PTM) = size(A.data)
+Base.getindex(A::PTM, I...) = getindex(A.data, I...)
+### TODO: Add Base.show method.
+
+"""
+    dequantise!(A::Array{T,3}, scale::AbstractVector{<:Real}, bias::AbstractVector{<:Real}) where T <: Real
+
+Dequantise coefficients in-place by subtracting bias and applying scale.
+
+Each plane `i` of `A` is transformed as `(A[i,:,:] .- bias[i]) .* scale[i]`.
+Vectors `scale` and `bias` must have length equal to the first dimension of `A`.
+
+See also [`dequantize!`](@dequantize!) for the American-English spelling alias.
+"""
+function dequantise!(A::Array{T,3}, scale::AbstractVector{<:Real}, bias::AbstractVector{<:Real})::Array{Float64,3} where T <: Real
     # Iterate over first dimension of A.
-    nplanes, _ = size(A)
-    for i ∈ 1:nplanes
-        A[i,:,:] .-= bias[i+3] # Subtract bias.
-        A[i,:,:] .*= scale[i+3] # Multiply 2-D plane by corresponding scalar.
+    @views for i ∈ axes(A, 1)
+        A[i,:,:] .-= bias[i] # Subtract bias.
+        A[i,:,:] .*= scale[i] # Multiply 2-D plane by corresponding scalar.
     end
     return A
 end

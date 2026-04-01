@@ -4,8 +4,8 @@
 
 Reflectance is a Julia package for loading, testing, and benchmarking [relightable images](https://doi.org/10.1145/3208806.3208820) captured using [Reflectance Transformation Imaging (RTI)](https://culturalheritageimaging.org/Technologies/RTI/) applications.
 
-> [!IMPORTANT] Project status
-> Early development
+> [!IMPORTANT]
+> **Project status:** Early development
 
 ## Overview
 

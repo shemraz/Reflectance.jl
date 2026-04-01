@@ -2,7 +2,7 @@
 
 ## Basis type and constructor.
 struct PTM <: AbstractBasis
-    data::Array{Float64,3} # Dequantised array of RGB and coefficient values.
+    data::Array{Float64, 3} # Dequantised array of RGB and coefficient values.
 end
 
 """
@@ -15,13 +15,13 @@ coefficients.
 
 See also [`loaddir`](@loaddir), [`dequantise!`/`dequantize!`](@dequantise!).
 """
-function PTM(A::Array{T,3}, material::Material)::PTM where T <: Real
+function PTM(A::Array{T, 3}, material::Material)::PTM where {T <: Real}
     # Dequantise coefficients before constructing PTM.
     dequantise!(
         A,
         @view(material.scale[4:end]),
         @view(material.bias[4:end])
-    ) 
+    )
     return PTM(A)
 end
 
@@ -35,7 +35,7 @@ The array must be manually dequantised before construction.
 
 See also [`dequantise!`/`dequantize!`](@dequantise!), [`loaddir`](@loaddir).
 """
-function PTM(A::Array{T,3})::PTM where T <: Real
+function PTM(A::Array{T, 3})::PTM where {T <: Real}
     return PTM(A)
 end
 
@@ -54,14 +54,13 @@ Vectors `scale` and `bias` must have length equal to the first dimension of `A`.
 
 See also [`dequantize!`](@dequantize!) for the American-English spelling alias.
 """
-function dequantise!(A::Array{T,3}, scale::AbstractVector{<:Real}, bias::AbstractVector{<:Real})::Array{Float64,3} where T <: Real
+function dequantise!(A::Array{T, 3}, scale::AbstractVector{<:Real}, bias::AbstractVector{<:Real})::Array{Float64, 3} where {T <: Real}
     # Iterate over first dimension of A.
-    @views for i ∈ axes(A, 1)
-        A[i,:,:] .-= bias[i] # Subtract bias.
-        A[i,:,:] .*= scale[i] # Multiply 2-D plane by corresponding scalar.
+    @views for i in axes(A, 1)
+        A[i, :, :] .-= bias[i] # Subtract bias.
+        A[i, :, :] .*= scale[i] # Multiply 2-D plane by corresponding scalar.
     end
     return A
 end
 
 dequantize!::Function = dequantise! # Alias for American-English spelling.
-

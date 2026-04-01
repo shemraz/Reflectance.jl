@@ -3,7 +3,7 @@
 ## Core types used by all relightables.
 
 ### Supertype of all bases.
-abstract type AbstractBasis end 
+abstract type AbstractBasis end
 
 ### Used to dequantise planes.
 struct Material
@@ -29,15 +29,15 @@ StructTypes.StructType(::Type{Metadata}) = StructTypes.Struct()
 
 ## IO methods used to read image data into bases.
 
-function readplanes!(buffer::AbstractArray{T,3}, file::String, scale::Real)::Nothing where T <: Real
+function readplanes!(buffer::AbstractArray{T, 3}, file::String, scale::Real)::Nothing where {T <: Real}
     # Load plane into view of N×H×W array.
     buffer .= reinterpret(reshape, T, JpegTurbo.jpeg_decode(RGB{T}, file; scale_ratio = scale))
     return nothing
 end
 
-function readplanes!(buffer::Array{T,3}, files::Vector{String}, scale::Real)::Nothing where T <: Real
+function readplanes!(buffer::AbstractArray{T, 3}, files::Vector{String}, scale::Real)::Nothing where {T <: Real}
     # Iterate over planes, loading slices into an array along the first dimension.
-    @inbounds for (n, file) in enumerate(files)
+    return @inbounds for (n, file) in enumerate(files)
         nslices = (3n - 2):3n # Take 3 slices at a time.
         readplanes!(view(buffer, nslices, :, :), file, scale)
     end
@@ -65,7 +65,7 @@ A tuple containing:
 
 See also [`PTM`](@PTM).
 """
-function loaddir(Basis::Type{T}, dir::String; scale::Real = 1)::Tuple{AbstractMatrix,T} where T <: AbstractBasis
+function loaddir(Basis::Type{T}, dir::String; scale::Real = 1)::Tuple{AbstractMatrix, T} where {T <: AbstractBasis}
     # Glob list of plane files in directory.
     base, planes... = glob("plane_*.jpg", dir)
     spec = joinpath(dir, "info.json") |> i -> Metadata(i)
@@ -73,8 +73,8 @@ function loaddir(Basis::Type{T}, dir::String; scale::Real = 1)::Tuple{AbstractMa
         x *= scale
         ceil(x)
     end
-    buffer = Array{Float64, 3}(undef, (spec.nplanes-3, height, width))
+    buffer = Array{Float64, 3}(undef, (spec.nplanes - 3, height, width))
     readplanes!(buffer, planes, scale) # Read planes into buffer.
-    
+
     return (JpegTurbo.jpeg_decode(base; scale_ratio = scale), Basis(buffer, spec.materials...))
 end

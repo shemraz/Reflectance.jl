@@ -16,39 +16,40 @@ Reflectance.jl aims to bring relightable images into the Julia ecosystem! The pa
 RTI bases are implemented as subtypes of `AbstractBasis`:
 
 ```
-                         AbstractBasis                         
-     ┌────────────┬────────────┴────────────┬────────────┐     
-    PTM          HSH          RBF          BLN          YCC    
-
+                     AbstractBasis                         
+ ┌────────────┬────────────┴────────────┬────────────┐     
+PTM          HSH          RBF          BLN          YCC    
 ```
 
 Bases behave like arrays and support Cartesian indexing:
 
 ```julia
-	using Reflectance
+using Reflectance
 
-	img, model = loaddir(PTM, "path/to/folder")
+img, model = loaddir(PTM, "path/to/folder")
 
-	model[1, :, :] |> typeof
+model[1, :, :] |> typeof
 ```
 
 ```julia
-	Matrix{Float64} (alias for Array{Float64, 2})
+Matrix{Float64} (alias for Array{Float64, 2})
 ```
 
 The following bases have been implemented (with more to come!):
-- `PTM` or [Polynomial Texture Map](https://doi.org/10.1145/383259.383320). PTMs approximate the luminance of a surface by evaluating polynomial curve, defined by a series of per-pixel coefficients computed from a set of images under varying light directions.
+
+- `PTM` or [Polynomial Texture Map.](https://doi.org/10.1145/383259.383320) PTMs approximate the luminance of a surface by evaluating polynomial curve, defined by a series of per-pixel coefficients computed from a set of images under varying light directions.
 
 ## Roadmap
-- [✓] Definition of core types for RTI bases.
-- [/] Basis implementations:
-	- [✓] PTM
+
+- [x] Definition of core types for RTI bases.
+- [ ] Basis implementations:
+	- [x] PTM
 	- [ ] HSH
 	- [ ] RBF
 	- [ ] BLN
 	- [ ] YCC
-- [✓] Basic rendering functionality.
-- [✓] Simple image export.
+- [x] Basic rendering functionality.
+- [x] Simple image export.
 - [ ] Benchmarking interface.
 	- [ ] Loading reference images.
 	- [ ] Evaluating luminance/chromaticity difference.
@@ -57,4 +58,4 @@ The following bases have been implemented (with more to come!):
 
 ## Credits
 
-This project wouldn't be possible without the amazing work of the Visual Computing Lab at CNR-ISTI in creating [relight](https://github.com/cnr-isti-vclab/relight).
+This project wouldn't be possible without the amazing work of the Visual Computing Lab at CNR-ISTI in creating [relight.](https://github.com/cnr-isti-vclab/relight)

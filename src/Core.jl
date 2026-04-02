@@ -76,5 +76,5 @@ function loaddir(Basis::Type{T}, dir::String; scale::Real = 1)::Tuple{AbstractMa
     buffer = Array{Float64, 3}(undef, (spec.nplanes - 3, height, width))
     readplanes!(buffer, planes, scale) # Read planes into buffer.
 
-    return (JpegTurbo.jpeg_decode(base; scale_ratio = scale), Basis(buffer, spec.materials...))
+    return (JpegTurbo.jpeg_decode(RGB{Float64}, base; scale_ratio = scale), Basis(buffer, spec.materials...))
 end

@@ -1,8 +1,8 @@
 # Reflectance.jl
 module Reflectance
 
+using Glob, ImageCore, StructTypes
 import JSON3, JpegTurbo
-using ImageCore, Glob, StructTypes
 
 ## Submodules
 ### Core

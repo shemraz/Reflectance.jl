@@ -9,6 +9,7 @@ abstract type AbstractBasis end
 struct Material
     scale::Vector{Float64}
     bias::Vector{Float64}
+    range::Union{Vector{Float64}, Nothing}
 end
 
 struct Metadata
@@ -20,6 +21,8 @@ struct Metadata
     nplanes::Int
     quality::Int
     materials::Vector{Material}
+    lights::Union{Vector{Float16},Nothing}
+    basis::Union{Vector{UInt8},Nothing}
 end
 
 ### Data in `info.json` is read directly into a Metadata struct.

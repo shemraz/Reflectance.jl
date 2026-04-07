@@ -1,4 +1,4 @@
 Manifest.toml
-test/images
-test/data/.*
+test/
 .JETLSConfig.toml
+.justfile

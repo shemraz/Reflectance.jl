@@ -43,24 +43,3 @@ end
 Base.size(A::PTM) = size(A.data)
 Base.getindex(A::PTM, I...) = getindex(A.data, I...)
 ### TODO: Add Base.show method.
-
-"""
-    dequantise!(A::Array{T,3}, scale::AbstractVector{<:Real}, bias::AbstractVector{<:Real}) where T <: Real
-
-Dequantise coefficients in-place by subtracting bias and applying scale.
-
-Each plane `i` of `A` is transformed as `(A[i,:,:] .- bias[i]) .* scale[i]`.
-Vectors `scale` and `bias` must have length equal to the first dimension of `A`.
-
-See also [`dequantize!`](@dequantize!) for the American-English spelling alias.
-"""
-function dequantise!(A::Array{T, 3}, scale::AbstractVector{<:Real}, bias::AbstractVector{<:Real})::Array{Float64, 3} where {T <: Real}
-    # Iterate over first dimension of A.
-    @views for i in axes(A, 1)
-        A[i, :, :] .-= bias[i] # Subtract bias.
-        A[i, :, :] .*= scale[i] # Multiply 2-D plane by corresponding scalar.
-    end
-    return A
-end
-
-dequantize!::Function = dequantise! # Alias for American-English spelling.

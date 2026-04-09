@@ -46,6 +46,37 @@ function readplanes!(buffer::AbstractArray{T, 3}, files::Vector{String}, scale::
     end
 end
 
+"""
+    dequantise!(A::Array{T,3}, scale::AbstractVector{<:Real}, bias::AbstractVector{<:Real}) where T <: Real
+
+Dequantise coefficients in-place by subtracting bias and applying scale.
+
+Each plane `i` of `A` is transformed as `(A[i,:,:] .- bias[i]) .* scale[i]`.
+Vectors `scale` and `bias` must have length equal to the first dimension of `A`.
+
+See also [`dequantize!`](@dequantize!) for the American-English spelling alias.
+"""
+function dequantise!(A::Array{T, 3}, scale::AbstractVector{<:Real}, bias::AbstractVector{<:Real})::Array{Float64, 3} where {T <: Real}
+    # Iterate over first dimension of A.
+    @views for i in axes(A, 1)
+        A[i, :, :] .-= bias[i] # Subtract bias.
+        A[i, :, :] .*= scale[i] # Multiply 2-D plane by corresponding scalar.
+    end
+    return A
+end
+
+function dequantise!(A::AbstractArray{T, 3}, range::AbstractVector{<:Real})::Array{Float64, 3} where {T <: Real}
+    offset = 127.0
+    # Iterate over first dimension of A, which is length N + 1.
+    @views for i in axes(A, 1)
+        A[i, :, :] .-= offset
+        A[i, :, :] ./= range[i] # Divide 2-D plane by corresponding scalar.
+    end
+    return A
+end
+
+dequantize!::Function = dequantise! # Alias for American-English spelling.
+
 ### API
 """
     loaddir(Basis::Type{T}, dir::String; scale::Real = 1)::Tuple{AbstractMatrix,T} where T <: AbstractBasis

@@ -18,18 +18,17 @@ function norm_vector(l::NTuple{3, AbstractFloat})::NTuple{3, AbstractFloat}
 end
 
 function light(A::PTM, l::NTuple{3, <:Real})::Matrix{Float64}
-    _, height, width = size(A)
-    u, v, _ = norm_vector(l)
-
     # Compute light-dependent weights.
-    ϕ(lᵤ, lᵥ) = [1.0, lᵥ, lᵤ, lᵤ * lᵥ, lᵥ^2, lᵤ^2]
+    u, v, _ = norm_vector(l)
+    weight(lᵤ, lᵥ) = [1.0, lᵥ, lᵤ, lᵤ * lᵥ, lᵥ^2, lᵤ^2]
 
     # Initialise transformation matrix.
+    _, height, width = size(A)
     T = Matrix{Float64}(undef, (height, width))
 
     # Loop over pixel coefficients
     for x in 1:height, y in 1:width
-        T[x, y] = weighted_sum(view(A.data, :, x, y), ϕ(u,v))
+        T[x, y] = weighted_sum(view(A.data, :, x, y), weight(u,v))
     end
 
     return T

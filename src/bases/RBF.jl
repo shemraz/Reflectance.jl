@@ -1,3 +1,3 @@
-struct RBF <: Basis
-    planes::Vector{Int8}
+struct RBF <: AbstractBasis
+    data::Array{Float64, 3}
 end

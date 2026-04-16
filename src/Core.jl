@@ -21,8 +21,9 @@ struct Metadata
     nplanes::Int
     quality::Int
     materials::Vector{Material}
-    lights::Union{Vector{Float16},Nothing}
-    basis::Union{Vector{UInt8},Nothing}
+    lights::Union{Vector{Float16}, Nothing}
+    basis::Union{Vector{UInt8}, Nothing}
+    sigma::Union{Float64, Nothing}
 end
 
 ### Data in `info.json` is read directly into a Metadata struct.
@@ -68,9 +69,9 @@ end
 function dequantise!(A::AbstractArray{T, 3}, range::AbstractVector{<:Real})::Array{Float64, 3} where {T <: Real}
     offset = 127.0
     # Iterate over first dimension of A, which is length N + 1.
-    @views for i in axes(A, 1)
-        A[i, :, :] .-= offset
-        A[i, :, :] ./= range[i] # Divide 2-D plane by corresponding scalar.
+    @views for i in axes(A, 3)
+        A[:, :, i] .-= offset
+        A[:, :, i] ./= range[i] # Divide 2-D plane by corresponding scalar.
     end
     return A
 end

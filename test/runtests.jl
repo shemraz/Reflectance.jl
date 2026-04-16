@@ -2,8 +2,13 @@ using Reflectance
 using Test
 using ImageCore
 
+# Functions
+
+intoindex = Int ∘ ceil
+downscale(i::Int)::Int = intoindex(1 // 8 * i)
+lvec = [rand(Float64, 2)..., -1 * rand(Float64, 1)...]
+
 @testset verbose = true "API" begin
-    img, model = loaddir(PTM, "data/ptm"; scale = 1 // 8)
     data = Reflectance.Metadata("data/ptm/info.json")
     properties = Symbol[
         :width,
@@ -17,15 +22,24 @@ using ImageCore
     ]
     @testset verbose = true "Types" begin
         @testset "PTM" begin
-            intoindex = Int ∘ ceil
-            downscale(i::Int)::Int = intoindex(1 // 8 * i)
-
-            @test img isa Matrix{RGB{Float64}}
-            @test model isa PTM
-            @test model.data isa Array{Float64, 3}
             @test PTM <: AbstractBasis
-            @test size(model)[1] == (data.nplanes - 3)
-            @test map(downscale, (data.height, data.width)) == size(img) == size(model)[2:end]
+            @testset let (img, model) = loaddir(PTM, "data/ptm"; scale = 1 // 8)
+                @test img isa Matrix{RGB{Float64}}
+                @test model isa PTM
+                @test model.data isa Array{Float64, 3}
+                @test size(model)[1] == (data.nplanes - 3)
+                @test map(downscale, (data.height, data.width)) == size(img) == size(model)[2:end]
+            end
+        end
+
+        @testset "RBF" begin
+            @testset let model = loaddir(RBF, "data/rbf9"; scale = 1 // 8)
+                for p in [:data, :basis, :lights, :σ]
+                    @test hasproperty(model, p)
+                end
+                @test model.lights isa Vector{}
+                @test light(model, lvec) isa Matrix{RGB{Float64}} broken=true
+            end
         end
 
         @testset "Metadata" begin
@@ -51,15 +65,16 @@ using ImageCore
     end
 
     @testset "Methods" begin
-        lvec = (rand(Float64, 2)..., -1 * rand(Float64, 1)...)
-        T = light(model, lvec)
-        @test T isa Matrix{Float64}
-        @test size(T) == size(img)
-        result = T .* img |> clamp01!
-        @test result isa Matrix{RGB{Float64}}
-        @test img isa Matrix{RGB{Float64}}
-        @test size(result) == size(img) == size(T)
-        @test (maximum ∘ channelview)(result) <= 1.0
-        @test (minimum ∘ channelview)(result) >= 0.0
+        @testset let (img, model) = loaddir(PTM, "data/ptm"; scale = 1 // 8)
+            T = light(model, lvec)
+            @test T isa Matrix{Float64}
+            @test size(T) == size(img)
+            result = T .* img |> clamp01!
+            @test result isa Matrix{RGB{Float64}}
+            @test img isa Matrix{RGB{Float64}}
+            @test size(result) == size(img) == size(T)
+            @test (maximum ∘ channelview)(result) <= 1.0
+            @test (minimum ∘ channelview)(result) >= 0.0
+        end
     end
 end

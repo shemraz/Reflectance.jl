@@ -57,23 +57,23 @@ Vectors `scale` and `bias` must have length equal to the first dimension of `A`.
 
 See also [`dequantize!`](@dequantize!) for the American-English spelling alias.
 """
-function dequantise!(A::Array{T, 3}, scale::AbstractVector{<:Real}, bias::AbstractVector{<:Real})::Array{Float64, 3} where {T <: Real}
+function dequantise!(A::Array{T, 3}, scale::AbstractVector{<:Real}, bias::AbstractVector{<:Real})::Nothing where {T <: Real}
     # Iterate over first dimension of A.
     @views for i in axes(A, 1)
         A[i, :, :] .-= bias[i] # Subtract bias.
         A[i, :, :] .*= scale[i] # Multiply 2-D plane by corresponding scalar.
     end
-    return A
+    return nothing
 end
 
-function dequantise!(A::AbstractArray{T, 3}, range::AbstractVector{<:Real})::Array{Float64, 3} where {T <: Real}
+function dequantise!(A::AbstractArray{T, 3}, range::AbstractVector{<:Real})::Nothing where {T <: Real}
     offset = 127.0
-    # Iterate over first dimension of A, which is length N + 1.
+    # Iterate over first dimension of A, which has length == nplanes.
     @views for i in axes(A, 3)
         A[:, :, i] .-= offset
         A[:, :, i] ./= range[i] # Divide 2-D plane by corresponding scalar.
     end
-    return A
+    return nothing
 end
 
 dequantize!::Function = dequantise! # Alias for American-English spelling.

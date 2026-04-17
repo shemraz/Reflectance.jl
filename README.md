@@ -45,7 +45,7 @@ The following bases have been implemented (with more to come!):
 - [ ] Basis implementations:
 	- [x] PTM
 	- [ ] HSH
-	- [ ] RBF
+	- [x] RBF
 	- [ ] BLN
 	- [ ] YCC
 - [x] Basic rendering functionality.

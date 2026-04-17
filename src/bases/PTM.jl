@@ -40,6 +40,7 @@ function PTM(A::Array{T, 3})::PTM where {T <: Real}
 end
 
 ## Implements array-like behaviour.
+Base.length(A::PTM) = length(A.data)
 Base.size(A::PTM) = size(A.data)
 Base.getindex(A::PTM, I...) = getindex(A.data, I...)
 ### TODO: Add Base.show method.

@@ -16,9 +16,6 @@ include("bases/PTM.jl")
 export PTM
 include("bases/RBF.jl")
 export RBF
-
-### Rendering methods
-include("Render.jl")
 export light
 
 end

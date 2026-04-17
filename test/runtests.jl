@@ -1,13 +1,14 @@
+# test/runtests.jl
 using Reflectance
 using Test
 using ImageCore
 
-# Functions
-
+## Functions
 intoindex = Int ∘ ceil
 downscale(i::Int)::Int = intoindex(1 // 8 * i)
 lvec = [rand(Float64, 2)..., -1 * rand(Float64, 1)...]
 
+## Tests
 @testset verbose = true "API" begin
     data = Reflectance.Metadata("data/ptm/info.json")
     properties = Symbol[
@@ -34,11 +35,19 @@ lvec = [rand(Float64, 2)..., -1 * rand(Float64, 1)...]
 
         @testset "RBF" begin
             @testset let model = loaddir(RBF, "data/rbf9"; scale = 1 // 8)
+                @test model isa RBF
                 for p in [:data, :basis, :lights, :σ]
                     @test hasproperty(model, p)
                 end
-                @test model.lights isa Vector{}
-                @test light(model, lvec) isa Matrix{RGB{Float64}} broken=true
+
+                @test all(view(model.basis, 1, :, :) .<= 1.0)
+
+                @test Base.length(model) isa Integer
+                @test Base.size(model) isa Tuple{Int64, Int64, Int64}
+                i = rand(1:length(model))
+                @test Base.getindex(model, i) isa Float64
+                @test model.lights isa Matrix{Float16}
+                @test light(model, lvec) isa Array{Float64, 3}
             end
         end
 
